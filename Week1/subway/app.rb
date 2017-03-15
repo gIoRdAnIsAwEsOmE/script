@@ -1,9 +1,13 @@
-require "csv"
-require 'soda/client'
-
-client = SODA::Client.new({:domain => "data.cityofnewyork.us", :app_token => "1xtHEeIwbd4SwSfyS6gan9Lpvr"})
-results = client.get("he7q-3hwy", :$limit => 5000)
-puts "Got #{results.count} results. Dumping first results:"
-results.first.each do |k, v|
-  puts "#{k}: #{v}"
+require 'csv'
+require 'json'
+entrances = CSV.open('csv/subwayentrances.csv', :headers => true).map { |x| x.to_h }.to_json
+stations = CSV.open('csv/subwaystations.csv', :headers => true).map { |x| x.to_h }.to_json
+File.open("subways.json", "w+") do |subway|
+  subway << "[" + entrances + ","
+  subway << stations + "]"
+=begin
+  [0] = entrances
+  [1] = stations
+=end
 end
+    
