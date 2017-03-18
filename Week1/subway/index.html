@@ -1,0 +1,65 @@
+<html>
+  <head></head>
+  <style>
+	#map {
+	   height: 100%;
+	 }
+  </style>
+  <body>
+	<div id="map"></div>
+  </body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script>
+	let map;
+	function getLatLng(data){
+		//entrances
+		const entrances = data[0];
+		let entlocations = [];
+		for(let e of entrances){
+			entlocations.push(e["the_geom"]);
+		}
+		//stations
+		const stations = data[1];
+		let stalocations = [];
+		for(let s of stations){
+			stalocations.push(s["the_geom"]);
+		} // I know there is a better way to do this, but I forgot !
+		return [entlocations, stalocations];
+	}
+	function getData(callback){
+	  $.ajax({
+			url: "http://localhost:8000/subways.json",
+			method: "GET",
+			datatype: "json",
+			async: false,
+			success : (data) => {
+				if(typeof callback == "function"){
+					callback(data);
+				}
+			}
+	  });
+	}
+	function makeMarkers(data){
+		const latlng = getLatLng(data);
+		console.log(latlng);
+		for(let subway of latlng){
+			for(let place of subway){
+				place = (place.split("POINT (").pop()).split(")")[0].split(" ");
+				place = [parseFloat(place[0]),parseFloat(place[1])];
+				let marker = new google.maps.Marker({
+					position: {lat: place[1], lng: place[0]},
+					map: map
+        });
+			}
+		}
+	}
+	function initMap() {
+	  map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 40.742054, lng: -73.769417},
+          zoom: 10
+        });
+		getData(makeMarkers);
+	}
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxf5ZcHBEXO2_gqIQ_mUlc_lNG-uTPxE0&callback=initMap" async defer></script>
+</html>
