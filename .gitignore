@@ -1,3 +1,4 @@
 .env
 .DS_Store
 *.sw[A-Za-z]
+config.json
